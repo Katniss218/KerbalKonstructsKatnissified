@@ -1,5 +1,5 @@
 MODNAME		:= KerbalKonstructs
-KSPDIR		:= ${HOME}/ksp/KSP_linux
+KSPDIR		:= ${HOME}/KSP/KSP_1.10
 MANAGED		:= ${KSPDIR}/KSP_Data/Managed
 GAMEDATA	:= ${KSPDIR}/GameData
 MODGAMEDATA  := ${GAMEDATA}/${MODNAME}
