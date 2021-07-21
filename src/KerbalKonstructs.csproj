@@ -115,6 +115,10 @@
       <HintPath>..\..\..\Steam\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>E:\games\Kerbal Space Program 1.10.1 rp-1\KSP_x64_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\..\Steam\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
@@ -173,31 +177,49 @@
     <Compile Include="Core\StaticObjects\StaticModules\TileTextures\TileTextures.cs" />
     <Compile Include="Core\StaticObjects\StaticModules\Water\WaterSurface.cs" />
     <Compile Include="Editor\GroupEditor\GroupEditor.cs" />
+    <Compile Include="Editor\GroupEditor\GroupItem.cs" />
+    <Compile Include="Editor\GroupEditor\GroupItemView.cs" />
     <Compile Include="Editor\GroupEditor\GroupSelectorUI.cs" />
+    <Compile Include="Editor\GroupEditor\GroupView.cs" />
     <Compile Include="Editor\InstanceEditor\GrassColorPresetUI.cs" />
     <Compile Include="Editor\InstanceEditor\GrassColorUI.cs" />
     <Compile Include="Editor\InstanceEditor\GrassColorPresetUI2.cs" />
+    <Compile Include="Editor\InstanceEditor\InstanceItem.cs" />
+    <Compile Include="Editor\InstanceEditor\InstanceItemView.cs" />
+    <Compile Include="Editor\InstanceEditor\InstanceView.cs" />
     <Compile Include="Editor\InstanceEditor\VariantSelector.cs" />
     <Compile Include="Editor\KKEditorLogic.cs" />
+    <Compile Include="Editor\MapDecalEditor\MapDecalEditor.cs" />
+    <Compile Include="Editor\MapDecalEditor\MapDecalItem.cs" />
+    <Compile Include="Editor\MapDecalEditor\MapDecalItemView.cs" />
+    <Compile Include="Editor\MapDecalEditor\MapDecalView.cs" />
+    <Compile Include="Editor\ModelItem.cs" />
+    <Compile Include="Editor\ModelItemView.cs" />
     <Compile Include="Editor\Shared\DrawObject.cs" />
     <Compile Include="Editor\Shared\DrawTools.cs" />
-    <Compile Include="Editor\MapDecalEditor.cs" />
     <Compile Include="Editor\InstanceEditor\FacilityEditor.cs" />
     <Compile Include="Editor\InstanceEditor\LaunchSiteEditor.cs" />
     <Compile Include="Editor\Shared\EditorGizmo.cs" />
     <Compile Include="Editor\Shared\VectorRenderer.cs" />
+    <Compile Include="Editor\SpawnView.cs" />
     <Compile Include="ExternalAPI\API.cs" />
     <Compile Include="ExternalAPI\extLaunchSiteManager.cs" />
     <Compile Include="Facilities\Barracks\Barracks.cs" />
     <Compile Include="Facilities\Business\Business.cs" />
     <Compile Include="Facilities\Hangar\Hangar.cs" />
     <Compile Include="Facilities\Hangar\HangarKSCGUI.cs" />
+    <Compile Include="Facilities\IBarracks.cs" />
+    <Compile Include="Facilities\IProduction.cs" />
     <Compile Include="Facilities\KKFacility.cs" />
     <Compile Include="Facilities\FuelTanks\FuelTanks.cs" />
     <Compile Include="Facilities\GroundStation\GroundStation.cs" />
     <Compile Include="Facilities\KKFacilitySelector.cs" />
     <Compile Include="Facilities\LandingGuide\LandingGuideClasses.cs" />
+    <Compile Include="Facilities\Merchant\MerchantItem.cs" />
+    <Compile Include="Facilities\Merchant\MerchantItemView.cs" />
     <Compile Include="Facilities\RecoveryBase\RecoveryBase.cs" />
+    <Compile Include="Facilities\StaffItem.cs" />
+    <Compile Include="Facilities\StaffItemView.cs" />
     <Compile Include="Facilities\Storage\Storage.cs" />
     <Compile Include="Facilities\Storage\StorageGUI.cs" />
     <Compile Include="Facilities\Merchant\Merchant.cs" />
@@ -206,15 +228,62 @@
     <Compile Include="Facilities\Hangar\HangarGUI.cs" />
     <Compile Include="Core\LaunchSites\LaunchSite.cs" />
     <Compile Include="Facilities\Research\Research.cs" />
+    <Compile Include="Facilities\Storage\StorageItem.cs" />
+    <Compile Include="Facilities\Storage\StorageItemView.cs" />
+    <Compile Include="KodeUI\AnchorLayoutGroup.cs" />
+    <Compile Include="KodeUI\Draggable.cs" />
+    <Compile Include="KodeUI\ImageLoader.cs" />
+    <Compile Include="KodeUI\Layout.cs" />
+    <Compile Include="KodeUI\LayoutAnchor.cs" />
+    <Compile Include="KodeUI\LayoutDebug.cs" />
+    <Compile Include="KodeUI\LayoutPanel.cs" />
+    <Compile Include="KodeUI\Loader.cs" />
+    <Compile Include="KodeUI\RectTransformExtensions.cs" />
+    <Compile Include="KodeUI\ScrollView.cs" />
+    <Compile Include="KodeUI\Skin.cs" />
+    <Compile Include="KodeUI\SpriteLoader.cs" />
+    <Compile Include="KodeUI\Style.cs" />
+    <Compile Include="KodeUI\TabController.cs" />
+    <Compile Include="KodeUI\Titlebar.cs" />
+    <Compile Include="KodeUI\Touchable.cs" />
+    <Compile Include="KodeUI\TreeView.cs" />
+    <Compile Include="KodeUI\UIButton.cs" />
+    <Compile Include="KodeUI\UIDropdown.cs" />
+    <Compile Include="KodeUI\UIEmpty.cs" />
+    <Compile Include="KodeUI\UIImage.cs" />
+    <Compile Include="KodeUI\UIInputField.cs" />
+    <Compile Include="KodeUI\UIKit.cs" />
+    <Compile Include="KodeUI\UILayoutElement.cs" />
+    <Compile Include="KodeUI\UIObject.cs" />
+    <Compile Include="KodeUI\UIRectMask.cs" />
+    <Compile Include="KodeUI\UIRepeatButton.cs" />
+    <Compile Include="KodeUI\UIScrollbar.cs" />
+    <Compile Include="KodeUI\UISlider.cs" />
+    <Compile Include="KodeUI\UIText.cs" />
+    <Compile Include="KodeUI\UIToggle.cs" />
+    <Compile Include="KodeUI\Unity-Helpers\UnityExtensions.cs" />
+    <Compile Include="KodeUI\Unity-Helpers\UnityUtils.cs" />
+    <Compile Include="KodeUI\Utils.cs" />
+    <Compile Include="KodeUI\VertiLinkLayoutGroup.cs" />
+    <Compile Include="KodeUI\Viewport.cs" />
+    <Compile Include="KodeUI\Window.cs" />
     <Compile Include="Modules\Career\CareerEditor.cs" />
     <Compile Include="Modules\Career\CareerObjects.cs" />
     <Compile Include="Modules\Career\CareerScenario.cs" />
     <Compile Include="Modules\Career\CareerState.cs" />
     <Compile Include="Modules\Career\CareerUtils.cs" />
+    <Compile Include="Modules\MapIcons\MapIcon.cs" />
     <Compile Include="Modules\MapIcons\MapIconSelector.cs" />
     <Compile Include="Modules\MapIcons\MapIconDraw.cs" />
     <Compile Include="Modules\RemoteNet\ConnectionManager.cs" />
     <Compile Include="Modules\RemoteNet\KKCommNetHome.cs" />
+    <Compile Include="ResourceManager\IResourceContainer.cs" />
+    <Compile Include="ResourceManager\PartResourceContainer.cs" />
+    <Compile Include="ResourceManager\ResourceInfo.cs" />
+    <Compile Include="ResourceManager\ResourceManager.cs" />
+    <Compile Include="ResourceManager\ResourceSet.cs" />
+    <Compile Include="ResourceManager\ResourceSetContainer.cs" />
+    <Compile Include="ResourceManager\ResourceXferControl.cs" />
     <Compile Include="UI2\Editor\EditorModeSelector.cs" />
     <Compile Include="UI2\Editor\Group\GroupEditorToolbar.cs" />
     <Compile Include="UI2\Editor\Instance\ColorSelector.cs" />
@@ -225,6 +294,13 @@
     <Compile Include="UI2\KKStyle.cs" />
     <Compile Include="UI2\KKWindow2.cs" />
     <Compile Include="UI2\WindowManager2.cs" />
+    <Compile Include="UI\FacilityItem.cs" />
+    <Compile Include="UI\FacilityItemView.cs" />
+    <Compile Include="UI\FieldToggle.cs" />
+    <Compile Include="UI\IconToggle.cs" />
+    <Compile Include="UI\IncrementSize.cs" />
+    <Compile Include="UI\InfoLine.cs" />
+    <Compile Include="UI\InputLine.cs" />
     <Compile Include="UI\LandingGuide.cs" />
     <Compile Include="Core\StaticObjects\StaticModules\OnClick\GUIOnClick.cs" />
     <Compile Include="Core\StaticObjects\StaticModules\OnClick\AnimateOnClick.cs" />
@@ -233,9 +309,27 @@
     <Compile Include="Core\SpaceCenters\SpaceCenterManager.cs" />
     <Compile Include="Core\StaticObjects\InstanceUtil.cs" />
     <Compile Include="UI\KKWindow.cs" />
+    <Compile Include="UI\LaunchsiteCategoryIcon.cs" />
+    <Compile Include="UI\LaunchsiteFilter.cs" />
+    <Compile Include="UI\LaunchsiteItem.cs" />
+    <Compile Include="UI\LaunchsiteItemView.cs" />
+    <Compile Include="UI\Layout.cs" />
+    <Compile Include="UI\ListView.cs" />
+    <Compile Include="UI\Localization.cs" />
+    <Compile Include="UI\MiniToggle.cs" />
+    <Compile Include="UI\PositionButtons.cs" />
+    <Compile Include="UI\PositionEdit.cs" />
+    <Compile Include="UI\PositionLine.cs" />
+    <Compile Include="UI\ReferenceSystem.cs" />
+    <Compile Include="UI\StackSize.cs" />
+    <Compile Include="UI\StateButton.cs" />
+    <Compile Include="UI\ToggleText.cs" />
     <Compile Include="UI\ToolbarController.cs" />
+    <Compile Include="UI\TransferButtons.cs" />
     <Compile Include="UI\UIMain.cs" />
     <Compile Include="Core\Log.cs" />
+    <Compile Include="UI\ValueAdjuster.cs" />
+    <Compile Include="UI\VectorDisplay.cs" />
     <Compile Include="UI\WindowManager.cs" />
     <Compile Include="Addons\StageRecovery\StageRecoveryWrapper.cs" />
     <Compile Include="Core\StaticModels\StaticModel.cs" />
@@ -248,7 +342,6 @@
     <Compile Include="Editor\StaticsEditorGUI.cs" />
     <Compile Include="Facilities\GroundStation\TrackingStationGUI.cs" />
     <Compile Include="Facilities\StaffGUI.cs" />
-    <Compile Include="Facilities\SharedInterfaces.cs" />
     <Compile Include="UI2\KSCManager.cs" />
     <Compile Include="UI\NavGuidanceSystem.cs" />
     <Compile Include="Facilities\FacilityManager.cs" />
@@ -262,6 +355,7 @@
     <Compile Include="Modules\MapIcons\MapIconManager.cs" />
     <Compile Include="Utilities\ClassExtentions.cs" />
     <Compile Include="Utilities\DebugDrawer.cs" />
+    <Compile Include="Utilities\Enum.cs" />
     <Compile Include="Utilities\GrasColorCam.cs" />
     <Compile Include="Utilities\KKGraphics.cs" />
     <Compile Include="Utilities\MiscUtils.cs" />
@@ -279,7 +373,6 @@
     <Compile Include="Utilities\Zip\ZipHelper.cs" />
     <Compile Include="Utilities\Zip\ZipVersion.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT'">
     <PostBuildEvent>rmdir /q /s  $(ProjectDir)\obj
@@ -289,19 +382,8 @@ IF $(ConfigurationName) == Release (
 )</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rmdir /q /s  $(ProjectDir)\obj
-
-IF $(ConfigurationName) == Release (
-"C:\Program Files\Git\git-bash.exe" $(SolutionDir)\create_zip.sh 
-)
-
-IF $(ConfigurationName) == Release12 (
-"C:\Program Files\Git\git-bash.exe" $(SolutionDir)\create_zip.sh KSP122
-)
-
-IF $(ConfigurationName) == Release13 (
-"C:\Program Files\Git\git-bash.exe" $(SolutionDir)\create_zip.sh KSP131 
-)</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>echo %25time%25</PreBuildEvent>
