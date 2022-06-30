@@ -10,7 +10,6 @@ namespace KerbalKonstructs
 {
     public class PadSmoke : StaticModule
     {
-
         public string smokeReceiverName = "";
         public string smokeEmittersNames = "";
         //public string smokeName = "PadSmokeLvl2";
@@ -50,6 +49,7 @@ namespace KerbalKonstructs
 
     public class KKPadFX : LaunchPadFX
     {
+        // I think 'fxScale' is controlled by the LaunchPadFX and is the main driver of "should we emit the particles?".
 
         internal static bool isInitialized = false;
 
@@ -73,7 +73,7 @@ namespace KerbalKonstructs
         /// <param name="baseObject"></param>
         public void Setup(List<string> emitterTransformNames, GameObject baseObject, string smokeName)
         {
-            InitializePSystems();
+            InitializeParticleSystems();
             List<ParticleSystem> unityEmitters = new List<ParticleSystem>();
             List<KSPParticleEmitter> kspEmitters = new List<KSPParticleEmitter>();
 
@@ -177,11 +177,11 @@ namespace KerbalKonstructs
         /// <summary>
         /// Load the assets into memory
         /// </summary>
-        internal static void InitializePSystems()
+        internal static void InitializeParticleSystems()
         {
             if (!isInitialized)
             {
-                GetSquadPsystem();
+                GetSquadParticleSystem();
                 CustomSmoke();
                 isInitialized = true;
             }
@@ -189,7 +189,7 @@ namespace KerbalKonstructs
 
 
 
-        internal static void GetSquadPsystem()
+        internal static void GetSquadParticleSystem()
         {
             ParticleSystem pSystem;
 

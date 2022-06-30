@@ -61,7 +61,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xml"/>
+    <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEngine">
       <Private>False</Private>
@@ -159,6 +159,7 @@
     <Compile Include="Core\StaticObjects\StaticModules\GrassColor\GrassColor2.cs" />
     <Compile Include="Core\StaticObjects\StaticModules\GrassColor\GrassColorUtils.cs" />
     <Compile Include="Core\StaticObjects\StaticModules\GrassColor\TexturePreset.cs" />
+    <Compile Include="Core\StaticObjects\StaticModules\ParticleEmitter.cs" />
     <Compile Include="Core\StaticObjects\StaticModules\PadSmoke\PadSmoke.cs" />
     <Compile Include="Core\StaticObjects\StaticModules\RunwayPapi\RunwayPapi.cs" />
     <Compile Include="Core\StaticObjects\StaticModules\AnimateOnSunRise\AnimateOnSunRiseOld.cs" />
@@ -271,16 +272,19 @@
     <Compile Include="Utilities\Zip\ZipHelper.cs" />
     <Compile Include="Utilities\Zip\ZipVersion.cs" />
   </ItemGroup>
-<ItemGroup />
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT'">
-    <PostBuildEvent></PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent></PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent></PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
