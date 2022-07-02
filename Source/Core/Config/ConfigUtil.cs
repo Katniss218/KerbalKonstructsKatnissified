@@ -8,7 +8,7 @@ namespace KerbalKonstructs.Core
 {
 
     /// <summary>
-    /// Settings that are read from the Instance Config file
+    /// Settings read from the Instance Config file
     /// </summary>
     internal class CFGSetting : Attribute
     {
@@ -16,17 +16,19 @@ namespace KerbalKonstructs.Core
     }
 
     /// <summary>
-    /// Settings, that are written to the Savegame State file
+    /// Settings written to the Savegame State file
     /// </summary>
     internal class CareerSetting : Attribute
     {
 
     }
 
+    // We use dictionaries for the lookup of the parameter types, because they are way faster then making reflection lookups.
+    // We use reflection calls to scan for the types of StaticModule and StaticObject with the attribute CFGSettings
+    // We have for each cfgfile-setting a same named field in the classes, so we don't need a translation table.
+
     /// <summary>
-    /// We use dictionarys for the lookup of the parameter types, because they are way faster then making reflection lookups.
-    /// We use reflektion calls to scan for the  datatypes of SaticModule and StaticObject with the attribute CFGSettings
-    /// We have for each cfgfile-setting a same named field in the classes, so we don't need a translation table.
+    /// Uses reflection to fill in the fields of static modules and alike from the parsed config nodes.
     /// </summary>
     internal static class ConfigUtil
     {
@@ -40,7 +42,7 @@ namespace KerbalKonstructs.Core
 
         internal static Dictionary<string, FieldInfo> groupCenterFields = new Dictionary<string, FieldInfo>();
 
-        internal static HashSet<string> facilitiyTypes = new HashSet<string>();
+        internal static HashSet<string> facilityTypes = new HashSet<string>();
 
 
         // global stuff
@@ -52,251 +54,262 @@ namespace KerbalKonstructs.Core
         /// </summary>
         internal static void InitTypes()
         {
-            foreach (FieldInfo field in typeof(StaticModel).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach( FieldInfo field in typeof( StaticModel ).GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic ) )
             {
-                if (Attribute.IsDefined(field, typeof(CFGSetting)))
+                if( Attribute.IsDefined( field, typeof( CFGSetting ) ) )
                 {
-                    modelFields.Add(field.Name, field);
+                    modelFields.Add( field.Name, field );
                     //Log.Normal("Parser Model:" + field.Name + ": " + field.FieldType.ToString());
                 }
 
             }
-            foreach (FieldInfo field in typeof(StaticInstance).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach( FieldInfo field in typeof( StaticInstance ).GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic ) )
             {
-                if (Attribute.IsDefined(field, typeof(CFGSetting)))
+                if( Attribute.IsDefined( field, typeof( CFGSetting ) ) )
                 {
-                    instanceFields.Add(field.Name, field);
+                    instanceFields.Add( field.Name, field );
                     //Log.Normal("Parser Instance: " + field.Name + ": " + field.FieldType.ToString());
                 }
             }
 
-            foreach (FieldInfo field in typeof(MapDecalInstance).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach( FieldInfo field in typeof( MapDecalInstance ).GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic ) )
             {
-                if (Attribute.IsDefined(field, typeof(CFGSetting)))
+                if( Attribute.IsDefined( field, typeof( CFGSetting ) ) )
                 {
-                    mapDecalFields.Add(field.Name, field);
+                    mapDecalFields.Add( field.Name, field );
                 }
             }
 
 
-            foreach (FieldInfo field in typeof(MapDecalsMap).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach( FieldInfo field in typeof( MapDecalsMap ).GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic ) )
             {
-                if (Attribute.IsDefined(field, typeof(CFGSetting)))
+                if( Attribute.IsDefined( field, typeof( CFGSetting ) ) )
                 {
-                    mapDecalsMapFields.Add(field.Name, field);
+                    mapDecalsMapFields.Add( field.Name, field );
                 }
             }
 
-            foreach (FieldInfo field in typeof(GroupCenter).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach( FieldInfo field in typeof( GroupCenter ).GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic ) )
             {
-                if (Attribute.IsDefined(field, typeof(CFGSetting)))
+                if( Attribute.IsDefined( field, typeof( CFGSetting ) ) )
                 {
-                    groupCenterFields.Add(field.Name, field);
+                    groupCenterFields.Add( field.Name, field );
                 }
             }
 
-            facilitiyTypes = new HashSet<string>(Enum.GetNames(typeof(KKFacilityType)));
+            facilityTypes = new HashSet<string>( Enum.GetNames( typeof( KKFacilityType ) ) );
 
             initialized = true;
         }
 
+        // 2 methods for writing and 2 methods for reading.
+        // They mirror each other, writing into fields and properties.
+
+        // TODO - replace this with an attribute perhaps. Or look at how KSP itself fills in fields in part modules and mirror that.
 
         /// <summary>
-        /// Reads a setting from a ConfigNode and writes the content to the targets field with the same name
+        /// Writes a value from a config node into the target's FIELD.
         /// </summary>
-        /// <param name="target"></param>
-        /// <param name="field"></param>
-        /// <param name="cfgNode"></param>
-        internal static void ReadCFGNode(object target, FieldInfo field, ConfigNode cfgNode)
+        internal static void ReadCFGNode( object target, FieldInfo targetField, ConfigNode cfgNode )
         {
-            if (!cfgNode.HasValue(field.Name))
+            if( !cfgNode.HasValue( targetField.Name ) )
             {
                 return;
             }
 
-            if (!string.IsNullOrEmpty(cfgNode.GetValue(field.Name)))
+            if( !string.IsNullOrEmpty( cfgNode.GetValue( targetField.Name ) ) )
             {
-                switch (field.FieldType.ToString())
+                switch( targetField.FieldType.ToString() )
                 {
                     case "System.String":
-                        field.SetValue(target, cfgNode.GetValue(field.Name));
+                        targetField.SetValue( target, cfgNode.GetValue( targetField.Name ) );
                         break;
+
                     case "System.Int32":
-                        field.SetValue(target, int.Parse(cfgNode.GetValue(field.Name)));
+                        targetField.SetValue( target, int.Parse( cfgNode.GetValue( targetField.Name ) ) );
                         break;
+
                     case "System.Single":
-                        field.SetValue(target, float.Parse(cfgNode.GetValue(field.Name)));
+                        targetField.SetValue( target, float.Parse( cfgNode.GetValue( targetField.Name ) ) );
                         break;
+
                     case "System.Double":
-                        field.SetValue(target, double.Parse(cfgNode.GetValue(field.Name)));
+                        targetField.SetValue( target, double.Parse( cfgNode.GetValue( targetField.Name ) ) );
                         break;
+
                     case "System.Boolean":
                         bool result;
-                        bool.TryParse(cfgNode.GetValue(field.Name), out result);
-                        field.SetValue(target, result);
+                        bool.TryParse( cfgNode.GetValue( targetField.Name ), out result );
+                        targetField.SetValue( target, result );
                         break;
+
                     case "UnityEngine.Vector3":
-                        field.SetValue(target, ConfigNode.ParseVector3(cfgNode.GetValue(field.Name)));
+                        targetField.SetValue( target, ConfigNode.ParseVector3( cfgNode.GetValue( targetField.Name ) ) );
                         break;
+
                     case "UnityEngine.Vector3d":
-                        field.SetValue(target, ConfigNode.ParseVector3D(cfgNode.GetValue(field.Name)));
+                        targetField.SetValue( target, ConfigNode.ParseVector3D( cfgNode.GetValue( targetField.Name ) ) );
                         break;
+
                     case "UnityEngine.Color":
-                        field.SetValue(target, ConfigNode.ParseColor(cfgNode.GetValue(field.Name)));
+                        targetField.SetValue( target, ConfigNode.ParseColor( cfgNode.GetValue( targetField.Name ) ) );
                         break;
+
                     case "CelestialBody":
-                        field.SetValue(target, ConfigUtil.GetCelestialBody(cfgNode.GetValue(field.Name)));
+                        targetField.SetValue( target, GetCelestialBody( cfgNode.GetValue( targetField.Name ) ) );
                         break;
+
                     case "KerbalKonstructs.Core.SiteType":
                         SiteType value = SiteType.Any;
                         try
                         {
-                            value = (SiteType)Enum.Parse(typeof(SiteType), cfgNode.GetValue(field.Name));
+                            value = (SiteType)Enum.Parse( typeof( SiteType ), cfgNode.GetValue( targetField.Name ) );
 
                         }
                         catch
                         {
                             value = SiteType.Any;
                         }
-                        field.SetValue(target, value);
+                        targetField.SetValue( target, value );
                         break;
+
                     case "KerbalKonstructs.Core.LaunchSiteCategory":
                         LaunchSiteCategory category;
                         try
                         {
-                            category = (LaunchSiteCategory)Enum.Parse(typeof(LaunchSiteCategory), cfgNode.GetValue(field.Name));
+                            category = (LaunchSiteCategory)Enum.Parse( typeof( LaunchSiteCategory ), cfgNode.GetValue( targetField.Name ) );
 
                         }
                         catch
                         {
                             category = LaunchSiteCategory.Other;
                         }
-                        field.SetValue(target, category);
+                        targetField.SetValue( target, category );
                         break;
                 }
-
             }
         }
 
         /// <summary>
-        /// Reads a property setting from a ConfigNode and writes the content to the targets field with the same name
+        /// Writes a value from a config node into the target's PROPERTY.
         /// </summary>
-        /// <param name="target"></param>
-        /// <param name="property"></param>
-        /// <param name="cfgNode"></param>
-        internal static void ReadCFGNode(object target, PropertyInfo property, ConfigNode cfgNode)
+        internal static void ReadCFGNode( object target, PropertyInfo targetProperty, ConfigNode cfgNode )
         {
-            if (!cfgNode.HasValue(property.Name))
+            if( !cfgNode.HasValue( targetProperty.Name ) )
                 return;
 
-            if (!string.IsNullOrEmpty(cfgNode.GetValue(property.Name)))
+            if( !string.IsNullOrEmpty( cfgNode.GetValue( targetProperty.Name ) ) )
             {
-                switch (property.PropertyType.ToString())
+                switch( targetProperty.PropertyType.ToString() )
                 {
                     case "System.String":
-                        property.SetValue(target, cfgNode.GetValue(property.Name), null);
+                        targetProperty.SetValue( target, cfgNode.GetValue( targetProperty.Name ), null );
                         break;
+
                     case "System.Int32":
-                        property.SetValue(target, int.Parse(cfgNode.GetValue(property.Name)), null);
+                        targetProperty.SetValue( target, int.Parse( cfgNode.GetValue( targetProperty.Name ) ), null );
                         break;
+
                     case "System.Single":
-                        property.SetValue(target, float.Parse(cfgNode.GetValue(property.Name)), null);
+                        targetProperty.SetValue( target, float.Parse( cfgNode.GetValue( targetProperty.Name ) ), null );
                         break;
+
                     case "System.Double":
-                        property.SetValue(target, double.Parse(cfgNode.GetValue(property.Name)), null);
+                        targetProperty.SetValue( target, double.Parse( cfgNode.GetValue( targetProperty.Name ) ), null );
                         break;
+
                     case "System.Boolean":
                         bool result;
-                        bool.TryParse(cfgNode.GetValue(property.Name), out result);
-                        property.SetValue(target, result, null);
+                        bool.TryParse( cfgNode.GetValue( targetProperty.Name ), out result );
+                        targetProperty.SetValue( target, result, null );
                         break;
+
                     case "UnityEngine.Vector3":
-                        property.SetValue(target, ConfigNode.ParseVector3(cfgNode.GetValue(property.Name)), null);
+                        targetProperty.SetValue( target, ConfigNode.ParseVector3( cfgNode.GetValue( targetProperty.Name ) ), null );
                         break;
+
                     case "UnityEngine.Vector3d":
-                        property.SetValue(target, ConfigNode.ParseVector3D(cfgNode.GetValue(property.Name)), null);
+                        targetProperty.SetValue( target, ConfigNode.ParseVector3D( cfgNode.GetValue( targetProperty.Name ) ), null );
                         break;
+
                     case "CelestialBody":
-                        property.SetValue(target, ConfigUtil.GetCelestialBody(cfgNode.GetValue(property.Name)), null);
+                        targetProperty.SetValue( target, GetCelestialBody( cfgNode.GetValue( targetProperty.Name ) ), null );
                         break;
+
                     case "UnityEngine.Color":
-                        property.SetValue(target, ConfigNode.ParseColor(cfgNode.GetValue(property.Name)), null);
+                        targetProperty.SetValue( target, ConfigNode.ParseColor( cfgNode.GetValue( targetProperty.Name ) ), null );
                         break;
+
                     case "KerbalKonstructs.Core.SiteType":
                         SiteType value;
                         try
                         {
-                            value = (SiteType)Enum.Parse(typeof(SiteType), cfgNode.GetValue(property.Name));
+                            value = (SiteType)Enum.Parse( typeof( SiteType ), cfgNode.GetValue( targetProperty.Name ) );
 
                         }
                         catch
                         {
                             value = SiteType.Any;
                         }
-                        property.SetValue(target, value, null);
+                        targetProperty.SetValue( target, value, null );
                         break;
+
                     case "KerbalKonstructs.Core.LaunchSiteCategory":
                         LaunchSiteCategory category = LaunchSiteCategory.Other;
                         try
                         {
-                            category = (LaunchSiteCategory)Enum.Parse(typeof(LaunchSiteCategory), cfgNode.GetValue(property.Name));
+                            category = (LaunchSiteCategory)Enum.Parse( typeof( LaunchSiteCategory ), cfgNode.GetValue( targetProperty.Name ) );
 
                         }
                         catch
                         {
                             category = LaunchSiteCategory.Other;
                         }
-                        property.SetValue(target, category, null);
+                        targetProperty.SetValue( target, category, null );
                         break;
                 }
-
             }
         }
-
 
         /// <summary>
         /// Writes a setting from an object to a confignode
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="field"></param>
-        /// <param name="cfgNode"></param>
-        internal static void Write2CfgNode(object source, FieldInfo field, ConfigNode cfgNode)
+        internal static void WriteToConfigNode( object source, FieldInfo field, ConfigNode cfgNode )
         {
-
-            switch (field.FieldType.ToString())
+            switch( field.FieldType.ToString() )
             {
                 case "System.String":
-                    cfgNode.SetValue(field.Name, (string)field.GetValue(source), true);
+                    cfgNode.SetValue( field.Name, (string)field.GetValue( source ), true );
                     break;
                 case "System.Int32":
-                    cfgNode.SetValue(field.Name, (int)field.GetValue(source), true);
+                    cfgNode.SetValue( field.Name, (int)field.GetValue( source ), true );
                     break;
                 case "System.Single":
-                    cfgNode.SetValue(field.Name, (float)field.GetValue(source), true);
+                    cfgNode.SetValue( field.Name, (float)field.GetValue( source ), true );
                     break;
                 case "System.Double":
-                    cfgNode.SetValue(field.Name, (double)field.GetValue(source), true);
+                    cfgNode.SetValue( field.Name, (double)field.GetValue( source ), true );
                     break;
                 case "System.Boolean":
-                    cfgNode.SetValue(field.Name, (bool)field.GetValue(source), true);
+                    cfgNode.SetValue( field.Name, (bool)field.GetValue( source ), true );
                     break;
                 case "UnityEngine.Vector3":
-                    cfgNode.SetValue(field.Name, (Vector3)field.GetValue(source), true);
+                    cfgNode.SetValue( field.Name, (Vector3)field.GetValue( source ), true );
                     break;
                 case "UnityEngine.Vector3d":
-                    cfgNode.SetValue(field.Name, (Vector3d)field.GetValue(source), true);
+                    cfgNode.SetValue( field.Name, (Vector3d)field.GetValue( source ), true );
                     break;
                 case "UnityEngine.Color":
-                    cfgNode.SetValue(field.Name, (Color)field.GetValue(source), true);
+                    cfgNode.SetValue( field.Name, (Color)field.GetValue( source ), true );
                     break;
                 case "CelestialBody":
-                    cfgNode.SetValue(field.Name, ((CelestialBody)field.GetValue(source)).name, true);
+                    cfgNode.SetValue( field.Name, ((CelestialBody)field.GetValue( source )).name, true );
                     break;
                 case "KerbalKonstructs.Core.SiteType":
-                    cfgNode.SetValue(field.Name, ((SiteType)field.GetValue(source)).ToString(), true);
+                    cfgNode.SetValue( field.Name, ((SiteType)field.GetValue( source )).ToString(), true );
                     break;
                 case "KerbalKonstructs.Core.LaunchSiteCategory":
-                    cfgNode.SetValue(field.Name, ((LaunchSiteCategory)field.GetValue(source)).ToString(), true);
+                    cfgNode.SetValue( field.Name, ((LaunchSiteCategory)field.GetValue( source )).ToString(), true );
                     break;
             }
         }
@@ -304,42 +317,39 @@ namespace KerbalKonstructs.Core
         /// <summary>
         /// Writes a property setting from an object to a confignode
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="property"></param>
-        /// <param name="cfgNode"></param>
-        internal static void Write2CfgNode(object source, PropertyInfo property, ConfigNode cfgNode)
+        internal static void Write2CfgNode( object source, PropertyInfo property, ConfigNode cfgNode )
         {
-            switch (property.PropertyType.ToString())
+            switch( property.PropertyType.ToString() )
             {
                 case "System.String":
-                    cfgNode.SetValue(property.Name, (string)property.GetValue(source, null), true);
+                    cfgNode.SetValue( property.Name, (string)property.GetValue( source, null ), true );
                     break;
                 case "System.Int32":
-                    cfgNode.SetValue(property.Name, (int)property.GetValue(source, null), true);
+                    cfgNode.SetValue( property.Name, (int)property.GetValue( source, null ), true );
                     break;
                 case "System.Single":
-                    cfgNode.SetValue(property.Name, (float)property.GetValue(source, null), true);
+                    cfgNode.SetValue( property.Name, (float)property.GetValue( source, null ), true );
                     break;
                 case "System.Double":
-                    cfgNode.SetValue(property.Name, (double)property.GetValue(source, null), true);
+                    cfgNode.SetValue( property.Name, (double)property.GetValue( source, null ), true );
                     break;
                 case "System.Boolean":
-                    cfgNode.SetValue(property.Name, (bool)property.GetValue(source, null), true);
+                    cfgNode.SetValue( property.Name, (bool)property.GetValue( source, null ), true );
                     break;
                 case "UnityEngine.Vector3":
-                    cfgNode.SetValue(property.Name, (Vector3)property.GetValue(source, null), true);
+                    cfgNode.SetValue( property.Name, (Vector3)property.GetValue( source, null ), true );
                     break;
                 case "UnityEngine.Vector3d":
-                    cfgNode.SetValue(property.Name, (Vector3d)property.GetValue(source, null), true);
+                    cfgNode.SetValue( property.Name, (Vector3d)property.GetValue( source, null ), true );
                     break;
                 case "UnityEngine.Color":
-                    cfgNode.SetValue(property.Name, (Color)property.GetValue(source, null), true);
+                    cfgNode.SetValue( property.Name, (Color)property.GetValue( source, null ), true );
                     break;
                 case "CelestialBody":
-                    cfgNode.SetValue(property.Name, ((CelestialBody)property.GetValue(source, null)).name, true);
+                    cfgNode.SetValue( property.Name, ((CelestialBody)property.GetValue( source, null )).name, true );
                     break;
                 case "KerbalKonstructs.Core.SiteType":
-                    cfgNode.SetValue(property.Name, ((SiteType)property.GetValue(source, null)).ToString(), true);
+                    cfgNode.SetValue( property.Name, ((SiteType)property.GetValue( source, null )).ToString(), true );
                     break;
             }
         }
@@ -348,20 +358,18 @@ namespace KerbalKonstructs.Core
         /// <summary>
         /// Fast convert of a bodyname to a CelestianBody object also Supports "Homeworld" as a key
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        internal static CelestialBody GetCelestialBody(String name)
+        internal static CelestialBody GetCelestialBody( string name )
         {
-            if (!bodiesInitialized)
+            if( !bodiesInitialized )
             {
                 CelestialBody[] bodies = FlightGlobals.Bodies.ToArray();
                 knownBodies = new Dictionary<string, CelestialBody>();
-                foreach (CelestialBody body in bodies)
+                foreach( CelestialBody body in bodies )
                 {
-                    knownBodies.Add(body.name, body);
-                    if (body.isHomeWorld)
+                    knownBodies.Add( body.name, body );
+                    if( body.isHomeWorld )
                     {
-                        knownBodies.Add("HomeWorld", body);
+                        knownBodies.Add( "HomeWorld", body );
                     }
 
                 }
@@ -369,25 +377,23 @@ namespace KerbalKonstructs.Core
             }
             CelestialBody returnValue;
 
-            if (knownBodies.TryGetValue(name, out returnValue))
+            if( knownBodies.TryGetValue( name, out returnValue ) )
             {
                 return returnValue;
             }
             else
             {
-                Log.UserError("Couldn't find body \"" + name + "\"");
+                Log.UserError( "Couldn't find body \"" + name + "\"" );
                 return null;
             }
         }
 
         internal static void CreateNewInstanceDirIfNeeded()
         {
-            if (!System.IO.Directory.Exists(KSPUtil.ApplicationRootPath + "GameData/" + KerbalKonstructs.newInstancePath))
+            if( !System.IO.Directory.Exists( KSPUtil.ApplicationRootPath + "GameData/" + KerbalKonstructs.newInstancePath ) )
             {
-                System.IO.Directory.CreateDirectory(KSPUtil.ApplicationRootPath + "GameData/" + KerbalKonstructs.newInstancePath);
+                System.IO.Directory.CreateDirectory( KSPUtil.ApplicationRootPath + "GameData/" + KerbalKonstructs.newInstancePath );
             }
         }
-
-
     }
 }

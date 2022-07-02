@@ -134,10 +134,8 @@ namespace KerbalKonstructs.Core
         }
 
         /// <summary>
-        /// Reads the ConfigNode and sets the values into the instance
+        /// Deserializes an instance from a config node.
         /// </summary>
-        /// <param name="target"></param>
-        /// <param name="cfgNode"></param>
         internal static void ParseInstanceConfig(StaticInstance target, ConfigNode cfgNode)
         {
             if (!ConfigUtil.initialized)
@@ -182,7 +180,7 @@ namespace KerbalKonstructs.Core
                     continue;
                 }
 
-                ConfigUtil.Write2CfgNode(instance, instanceSetting.Value, cfgNode);
+                ConfigUtil.WriteToConfigNode(instance, instanceSetting.Value, cfgNode);
 
             }
 
@@ -271,7 +269,7 @@ namespace KerbalKonstructs.Core
             {
                 if (mapDecalSetting.Value.GetValue(mapDecalInstance) != null)
                 {
-                    ConfigUtil.Write2CfgNode(mapDecalInstance, mapDecalSetting.Value, cfgNode);
+                    ConfigUtil.WriteToConfigNode(mapDecalInstance, mapDecalSetting.Value, cfgNode);
                 }
             }
         }

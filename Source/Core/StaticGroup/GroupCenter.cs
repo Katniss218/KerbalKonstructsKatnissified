@@ -369,7 +369,7 @@ namespace KerbalKonstructs.Core
                 {
                     continue;
                 }
-                ConfigUtil.Write2CfgNode(this, groupField, cfgNode);
+                ConfigUtil.WriteToConfigNode(this, groupField, cfgNode);
             }
         }
 

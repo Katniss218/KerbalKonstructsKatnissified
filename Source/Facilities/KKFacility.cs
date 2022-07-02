@@ -196,7 +196,7 @@ namespace KerbalKonstructs.Modules
                         continue;
                     }
 
-                    ConfigUtil.Write2CfgNode(this, field.Value, cfgNode);
+                    ConfigUtil.WriteToConfigNode(this, field.Value, cfgNode);
                 }
             }
             myProperties = allProperties[this.GetType().Name];
@@ -229,7 +229,7 @@ namespace KerbalKonstructs.Modules
             {
                 if (Attribute.IsDefined(field.Value, typeof(CareerSetting)))
                 {
-                    ConfigUtil.Write2CfgNode(this, field.Value, cfgNode);
+                    ConfigUtil.WriteToConfigNode(this, field.Value, cfgNode);
                 }
             }
 

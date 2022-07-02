@@ -64,7 +64,7 @@ namespace KerbalKonstructs.Core
                         continue;
                     }
 
-                    ConfigUtil.Write2CfgNode(site, field.Value, cfgNode);
+                    ConfigUtil.WriteToConfigNode(site, field.Value, cfgNode);
                 }
             }
 
@@ -93,7 +93,7 @@ namespace KerbalKonstructs.Core
             {
                 if (Attribute.IsDefined(field.Value, typeof(CareerSetting)))
                 {
-                    ConfigUtil.Write2CfgNode(site, field.Value, cfgNode);
+                    ConfigUtil.WriteToConfigNode(site, field.Value, cfgNode);
                 }
             }
 

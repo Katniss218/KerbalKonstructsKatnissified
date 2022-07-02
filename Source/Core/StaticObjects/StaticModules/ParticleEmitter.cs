@@ -10,156 +10,122 @@ namespace KerbalKonstructs
 {
     public class ParticleEmitter : StaticModule
     {
-        public string smokeEmittersNames = "";
+        public string emitterName = "";
 
         public string smokeName = "KKPadSmoke1";
 
-        private List<string> emitterTransforms = new List<string>();
-        private string[] seperators = new string[] { ",", ";" };
+        public float emitterScale = 1.0f;
 
         public void Start()
         {
-            //Log.Normal("PadSmoke Start");
-            var tmpList = smokeEmittersNames.Split( seperators, StringSplitOptions.RemoveEmptyEntries );
-
-            foreach( string value in tmpList )
-            {
-                emitterTransforms.Add( value.Trim() );
-            }
-
-            //Transform receiverTransform = gameObject.transform.FindRecursive(smokeReceiverName);
-            // Collider receiverCollider = receiverTransform.gameObject.GetComponent<Collider>();
-
             KKPadFX2 padfx = gameObject.AddOrGetComponent<KKPadFX2>();
-            padfx.Setup( emitterTransforms, gameObject, smokeName );
-            //if (receiverCollider != null)
-            //{
-            //    receiverCollider.tag = "LaunchpadFX";
-            //    //Log.Normal("Collider Tag: " + receiverCollider.tag);
-            //    receiverCollider.gameObject.layer = 15;
-            //}
-            //else
-            //{
-            //    Log.Warning("PadFX: Collider not found " + smokeReceiverName);
-            //}
+            padfx.Setup( emitterName, gameObject, smokeName, emitterScale );
         }
     }
 
     public class KKPadFX2 : MonoBehaviour
     {
-        [SerializeField]
-        protected ParticleSystem[] ps;
-        [SerializeField]
-        protected Material smokeParticleMaterial;
-        //[Range( 0, 1 )]
-        //[SerializeField]
-        //protected float fxScale;
-
-        internal static bool isInitialized = false;
-
-        private static List<string> stockNames = new List<string> { "PadSmokeLvl2", "PadSmokeLvl3" };
-
-        //private FieldInfo totalFXField; // not used anymore since we're not driving the effect via the LaunchPadFX
-
-        internal struct KKEmitter
+        internal struct KKEmitter // TODO - this looks very dumb. Replace with a tuple?
         {
             internal List<ParticleSystem> particleSystems;
             internal List<KSPParticleEmitter> kspEmitters;
         }
 
-        internal static Dictionary<string, KKEmitter> particleSystems = new Dictionary<string, KKEmitter>();
+        [SerializeField]
+        protected ParticleSystem[] ps;
+
         KSPParticleEmitter[] kspPS;
 
+        private static List<string> stockNames = new List<string>() { "PadSmokeLvl2", "PadSmokeLvl3" };
+
         /// <summary>
-        /// Attaches the LaunchPadFX module and 
+        /// Some weird ass static dictionary holding an array of particle systems for each transform name.
         /// </summary>
-        /// <param name="emitterTransformNames"></param>
-        /// <param name="baseObject"></param>
-        public void Setup( List<string> emitterTransformNames, GameObject baseObject, string smokeName )
+        internal static Dictionary<string, KKEmitter> particleSystems = new Dictionary<string, KKEmitter>();
+
+
+        public void Setup( string emitterName, GameObject baseObject, string smokeName, float emitterScale )
         {
             InitializeParticleSystems();
+
             List<ParticleSystem> unityEmitters = new List<ParticleSystem>();
             List<KSPParticleEmitter> kspEmitters = new List<KSPParticleEmitter>();
 
-            //totalFXField = typeof( LaunchPadFX ).GetField( "totalFX", BindingFlags.NonPublic | BindingFlags.Instance );
+            Transform[] smokeTransforms = baseObject.transform.FindAllRecursive( emitterName );
 
-            foreach( string emName in emitterTransformNames )
+            foreach( Transform smokeTransform in smokeTransforms )
             {
-                foreach( Transform emTransform in baseObject.transform.FindAllRecursive( emName ) )
+                if( particleSystems.ContainsKey( smokeName ) )
                 {
-                    if( particleSystems.ContainsKey( smokeName ) )
+                    if( particleSystems[smokeName].particleSystems != null )
                     {
-                        if( particleSystems[smokeName].particleSystems != null )
+                        foreach( ParticleSystem particleSystemPrefab in particleSystems[smokeName].particleSystems )
                         {
-                            foreach( ParticleSystem pSystem in particleSystems[smokeName].particleSystems )
-                            {
-                                //Log.Normal("adding PSystem: " + pSystem.name);
-                                ParticleSystem emPsystem = Instantiate( pSystem, emTransform.position, emTransform.rotation, emTransform );
-                                emPsystem.gameObject.SetActive( true );
-                                unityEmitters.Add( emPsystem );
-                                FloatingOrigin.RegisterParticleSystem( emPsystem );
-                            }
-                        }
-                        if( particleSystems[smokeName].kspEmitters != null )
-                        {
-                            foreach( KSPParticleEmitter pSystem in particleSystems[smokeName].kspEmitters )
-                            {
-                                //Log.Normal("adding PSystem: " + pSystem.name);
-                                KSPParticleEmitter emPsystem = Instantiate( pSystem, emTransform.position, emTransform.rotation, emTransform );
-                                emPsystem.gameObject.SetActive( true );
-                                kspEmitters.Add( emPsystem );
-                            }
-                        }
+                            ParticleSystem newPS = Instantiate( particleSystemPrefab, smokeTransform.position, smokeTransform.rotation, smokeTransform );
+                            newPS.gameObject.SetActive( true );
+                            newPS.transform.localScale = new Vector3( emitterScale, emitterScale, emitterScale );
 
-
+                            unityEmitters.Add( newPS );
+                            FloatingOrigin.RegisterParticleSystem( newPS );
+                        }
                     }
-                    else
+                    if( particleSystems[smokeName].kspEmitters != null )
                     {
-                        Log.UserError( "Cannot find a LaunchPad Smoke with name: " + smokeName );
+                        foreach( KSPParticleEmitter kspParticlePrefab in particleSystems[smokeName].kspEmitters )
+                        {
+                            KSPParticleEmitter newKSPPE = Instantiate( kspParticlePrefab, smokeTransform.position, smokeTransform.rotation, smokeTransform );
+                            newKSPPE.gameObject.SetActive( true );
+                            newKSPPE.transform.localScale = new Vector3( emitterScale, emitterScale, emitterScale );
+
+                            kspEmitters.Add( newKSPPE );
+                        }
                     }
                 }
+                else
+                {
+                    Log.UserError( "Cannot find a LaunchPad Smoke with name: " + smokeName );
+                }
             }
+
             // assign the emitters to the underlying component
             ps = unityEmitters.ToArray();
             kspPS = kspEmitters.ToArray();
         }
 
-
         public void LateUpdate()
         {
+            // TODO - Entire method is probably unnecessary.
             foreach( ParticleSystem pSystem in ps )
             {
                 ParticleSystem.MainModule main = pSystem.main;
                 ParticleSystem.EmissionModule psEmissionModule = pSystem.emission;
-                    if( !pSystem.isPlaying )
-                    {
-                        pSystem.Play();
-                    }
-                    if( !psEmissionModule.enabled )
-                    {
-                        psEmissionModule.enabled = true;
-                    }
-                    main.startColor = main.startColor.color.SetAlpha( 1 );
+                if( !pSystem.isPlaying )
+                {
+                    pSystem.Play();
+                }
+                if( !psEmissionModule.enabled )
+                {
+                    psEmissionModule.enabled = true;
+                }
+                main.startColor = main.startColor.color.SetAlpha( 1 );
             }
 
             foreach( KSPParticleEmitter kspSystem in kspPS )
             {
-                    kspSystem.emit = true;
-                    kspSystem.doesAnimateColor = false;
-                    kspSystem.color = kspSystem.color.SetAlpha( 1 );
-                
+                kspSystem.emit = true;
+                kspSystem.doesAnimateColor = false;
+                kspSystem.color = kspSystem.color.SetAlpha( 1 );
             }
-            // reset the emissions
-
-            //totalFXField.SetValue( this, 0f );
         }
 
+        // #####################################################
+        // Static functions below
+        // #####################################################
 
-
-        //static functions below
+        internal static bool isInitialized = false;
 
         /// <summary>
-        /// Load the assets into memory
+        /// Even though this is static, it's getting called every time an object is instantiated. And then it checks if any object was already instantiated (so it only runs once).
         /// </summary>
         internal static void InitializeParticleSystems()
         {
@@ -171,9 +137,7 @@ namespace KerbalKonstructs
             }
         }
 
-
-
-        internal static void GetSquadParticleSystem()
+        static void GetSquadParticleSystem()
         {
             ParticleSystem pSystem;
 
@@ -186,16 +150,20 @@ namespace KerbalKonstructs
                 {
                     Log.Normal( "found: " + psName );
 
-
-                    KKEmitter emitter = new KKEmitter { particleSystems = new List<ParticleSystem> { pSystem } };
+                    KKEmitter emitter = new KKEmitter()
+                    {
+                        particleSystems = new List<ParticleSystem>()
+                        {
+                            pSystem
+                        }
+                    };
 
                     particleSystems.Add( psName, emitter );
                 }
             }
         }
 
-
-        internal static void CustomSmoke()
+        static void CustomSmoke()
         {
             foreach( UrlDir.UrlConfig smokeConfig in GameDatabase.Instance.GetConfigs( "KKLaunchPadSmoke" ) )
             {
@@ -270,8 +238,8 @@ namespace KerbalKonstructs
                     kspEmitters = kspEmitters,
                     particleSystems = psEmitters
                 };
-                particleSystems.Add( name, kKEmitter );
 
+                particleSystems.Add( name, kKEmitter );
             }
         }
     }
